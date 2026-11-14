@@ -1,0 +1,45 @@
+{
+  "name": "jms-backend",
+  "version": "0.1.0",
+  "description": "Jobsite Management System (JMS) - backend API",
+  "main": "src/server.js",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "migrate": "knex migrate:latest",
+    "migrate:rollback": "knex migrate:rollback",
+    "migrate:reset": "knex migrate:rollback --all",
+    "migrate:status": "knex migrate:status",
+    "migrate:make": "knex migrate:make",
+    "seed": "knex seed:run",
+    "db:check": "node -e \"require('./src/config/database').checkConnection().then(r=>{console.log(r);process.exit(r.ok?0:1)})\"",
+    "test:auth": "node test_auth.js",
+    "test:phase3": "node test_phase3.js",
+    "test:phase4": "node test_phase4.js",
+    "test:phase5": "node test_phase5.js",
+    "test:features": "node test_features_a_b.js",
+    "test:progress": "node test_feature_c.js",
+    "test:innovations": "node test_innovations.js",
+    "test": "node test_auth.js && node test_phase3.js && node test_phase4.js && node test_phase5.js && node test_features_a_b.js && node test_feature_c.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "knex": "^3.1.0",
+    "morgan": "^1.10.0",
+    "pg": "^8.13.1",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}

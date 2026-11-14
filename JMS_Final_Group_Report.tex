@@ -1,0 +1,1130 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage[a4paper,top=2.6cm,bottom=2.6cm,left=2.5cm,right=2.5cm,headheight=14pt]{geometry}
+\usepackage{amsmath}
+\usepackage{array,tabularx,booktabs,longtable,float}
+\usepackage[table]{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{titletoc}
+\usepackage{caption}
+\usepackage{multicol}
+\usepackage{url}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,topsep=4pt,parsep=0pt}
+\setlist[itemize,2]{label=--}
+\captionsetup{font=small,labelfont=bf,skip=6pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\hrow}{\rowcolor{gray!14}}
+\newcommand{\tablestyle}{\centering\small\renewcommand{\arraystretch}{1.3}}
+
+% ---------- running header / footer ----------
+\newcommand{\hdrtitle}{Final Project Report}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Jobsite Management System -- \hdrtitle}
+\fancyhead[R]{\small VJTI Mumbai, B.Tech IT}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\small\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+% ---------- contents styles ----------
+\titlecontents{part}[0pt]{\addvspace{7pt}\bfseries}{}{}{\titlerule*[0.6pc]{.}\contentspage}
+\titlecontents{section}[0pt]{\addvspace{5pt}\bfseries}{\contentslabel{1.6em}}{}{\titlerule*[0.6pc]{.}\contentspage}
+\titlecontents{subsection}[1.6em]{}{\contentslabel{2.4em}}{}{\titlerule*[0.6pc]{.}\contentspage}
+\setcounter{tocdepth}{0}
+
+% ---------- team data ----------
+\newcommand{\teamlist}{%
+\begin{tabular}{@{}l@{\hspace{2.2cm}}l@{}}
+Nihal Nayak & Roll No: 241080045\\
+Swami Nikam & Roll No: 241080046\\
+Regen Palkar & Roll No: 241080047\\
+Siddharth Pandey & Roll No: 241080048
+\end{tabular}}
+
+% ---------- cover page ----------
+\newcommand{\coverpage}[2]{%
+\clearpage
+\thispagestyle{plain}
+\begin{center}
+{\large\bfseries Veermata Jijabai Technological Institute (VJTI)\par}
+Matunga, Mumbai -- 400019\par
+\vspace{3pt}
+Department of Computer Engineering \& Information Technology\par
+Software Engineering Laboratory\par
+\vspace{1.8cm}
+\rule{\linewidth}{0.8pt}\par
+\vspace{0.5cm}
+{\fontsize{26}{30}\selectfont\bfseries Jobsite Management System\par}
+\vspace{0.4cm}
+{\large A Centralized Platform for Construction Project Management\par}
+\vspace{0.5cm}
+\rule{\linewidth}{0.8pt}\par
+\vspace{1.6cm}
+{\Large\bfseries #1\par}
+\vspace{0.5cm}
+{\large #2\par}
+\vspace{1.6cm}
+{\bfseries Group B3}\par
+\vspace{0.4cm}
+\teamlist\par
+\vspace{1.4cm}
+Academic Year: 2026--27
+\end{center}
+\clearpage}
+
+% ---------- part helpers ----------
+\newcommand{\jpart}[4]{% roman, title, topics, header title
+\clearpage
+\renewcommand{\hdrtitle}{#4}%
+\addcontentsline{toc}{part}{Part #1\hspace{0.8em}#2}%
+\coverpage{Part #1 -- #2}{#3}%
+\startcontents[part#1]%
+\setcounter{section}{0}\setcounter{table}{0}\setcounter{figure}{0}%
+\thispagestyle{plain}%
+\printcontents[part#1]{}{1}{\setcounter{tocdepth}{2}\section*{Contents}}%
+\clearpage}
+\newcommand{\jpartend}[1]{\stopcontents[part#1]}
+
+\newcommand{\figph}[2]{% caption, height
+\begin{figure}[H]\centering
+\fbox{\parbox[c][#2][c]{0.92\linewidth}{\centering\color{gray}\itshape Diagram to be inserted\par}}
+\caption{#1}
+\end{figure}}
+
+\titleformat{\section}{\Large\bfseries}{\thesection}{0.8em}{}
+\titlespacing*{\section}{0pt}{16pt}{6pt}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{0.8em}{}
+\titlespacing*{\subsection}{0pt}{10pt}{3pt}
+
+\begin{document}
+
+%================ FRONT MATTER ================
+\coverpage{Final Group Project Report}{Problem Statement \textbullet\ Requirements \textbullet\ Design \textbullet\ Estimation \textbullet\ Implementation \textbullet\ SQA \textbullet\ Testing \textbullet\ Conclusion and Future Scope}
+
+\section*{Certificate}
+This is to certify that the project entitled ``Jobsite Management System (JMS) -- A Centralized Platform for Construction Project Management'' has been successfully undertaken and documented by the following students of Group B3 as part of the Software Engineering Laboratory.
+
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{0.7\linewidth}{Yl}
+\toprule
+\hrow\textbf{Name} & \textbf{Roll No.}\\
+\midrule
+Nihal Nayak & 241080045\\
+Swami Nikam & 241080046\\
+Regen Palkar & 241080047\\
+Siddharth Pandey & 241080048\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The project work includes requirement analysis, project planning, resource and effort estimation, system design, implementation, software quality assurance, and testing.
+
+\vspace{1.6cm}
+Project Guide: \underline{\hspace{6cm}}\\[14pt]
+Signature: \underline{\hspace{6.6cm}}\\[14pt]
+Date: \underline{\hspace{7.4cm}}
+
+\clearpage
+\section*{Acknowledgement}
+We would like to express our sincere gratitude to our faculty and project guide for providing valuable guidance, support, and encouragement throughout the development of the Jobsite Management System.
+
+We are thankful to our institution for providing the necessary resources and facilities to complete this project as part of the Software Engineering Laboratory.
+
+We would also like to acknowledge the contributions of all group members for their cooperation and involvement in requirement analysis, system design, development, testing, documentation, and project implementation.
+
+This project has helped us understand the practical application of software engineering concepts and the complete software development lifecycle.
+
+\clearpage
+\section*{Abstract}
+The Jobsite Management System (JMS) is a centralized web-based application developed to simplify and improve the management of construction projects and day-to-day jobsite activities.
+
+Construction projects involve several activities, including project planning, task assignment, workforce management, attendance tracking, material inventory, equipment management, daily reporting, issue tracking, safety monitoring, and quality inspection. Managing these activities through manual records, spreadsheets, and separate communication platforms can result in delays, duplication of information, and difficulties in monitoring project progress.
+
+The proposed system provides a common digital platform through which administrators, project managers, site engineers, workers, contractors, and clients can access relevant project information according to their roles and permissions.
+
+The system is developed using React for the frontend and Node.js with Express.js for the backend. PostgreSQL, hosted through Supabase, is used for database management. The application includes authentication, role-based access control, project management, task management, workforce and attendance management, material inventory, equipment management, daily site reporting, issue management, safety and quality records, dashboards, analytics, and notifications.
+
+This report compiles the project documentation: the problem statement and scope, requirement analysis and SRS, design modelling, resource estimation, effort estimation (LOC, function point and COCOMO methods), implementation, software quality assurance, and testing using basis path analysis. It closes with the results, limitations, future scope, and conclusion. The main objective of the project is to improve information management, coordination, transparency, and monitoring of construction activities through a centralized software solution.
+
+\section*{Team and Roles}
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{lllY}
+\toprule
+\hrow\textbf{Team member} & \textbf{Roll No.} & \textbf{Primary role} & \textbf{Main responsibility}\\
+\midrule
+Nihal Nayak & 241080045 & Student Developer & Design, development, testing, and integration\\
+Swami Nikam & 241080046 & Student Developer & Design, development, testing, and integration\\
+Regen Palkar & 241080047 & Student Developer & Design, development, testing, and integration\\
+Siddharth Pandey & 241080048 & Student Developer & Design, development, testing, and integration\\
+\bottomrule
+\end{tabularx}
+\end{table}
+Frontend, backend, and database work is shared among the members, and all members take part in testing, documentation, and presentation. One group member acts as project coordinator for planning and coordination.
+
+\clearpage
+\tableofcontents
+
+%================ PART I ================
+\jpart{I}{Problem Statement and Scope}{Introduction \textbullet\ Objectives \textbullet\ Scope \textbullet\ Users \textbullet\ Proposed System}{Problem Statement and Scope}
+
+\section{Introduction}
+Construction projects involve the coordination of multiple activities, resources, workers, contractors, suppliers, equipment, and stakeholders. Every construction site generates a considerable amount of information related to project schedules, work assignments, workforce attendance, material availability, equipment usage, daily site reports, safety records, inspections, and project progress.
+
+In many construction environments, this information is managed using paper records, spreadsheets, phone calls, emails, and messaging applications. As the size and complexity of a project increase, these methods become difficult to manage and maintain. The absence of a centralized platform can result in communication gaps, inefficient resource utilization, difficulty in tracking project progress, duplication of information, and delayed identification of problems.
+
+To overcome these challenges, the Jobsite Management System (JMS) has been designed and developed as a centralized web-based application. The system provides a common platform for construction teams to manage project information, assign tasks, monitor workforce activities, track materials and equipment, record daily reports, manage issues, and monitor safety and quality-related information. The application also provides role-based access so that different users can access functions according to their responsibilities.
+
+\subsection{Purpose of the Project}
+The purpose of the Jobsite Management System is to digitize and centralize construction project management activities. It aims to reduce manual record keeping, improve communication, maintain organized project information, and provide better visibility into ongoing construction activities.
+
+\subsection{Need for the Project}
+The project is required because:
+\begin{itemize}
+\item Construction activities involve multiple stakeholders.
+\item Manual records are difficult to maintain and update.
+\item Project managers require regular information about project progress.
+\item Workforce attendance and assignments need proper tracking.
+\item Material availability must be monitored to avoid shortages.
+\item Issues and safety incidents require timely reporting.
+\item Project information should be accessible from a centralized platform.
+\end{itemize}
+
+\section{Problem Statement}
+\textbf{Jobsite Management System (JMS) -- A Centralized Platform for Construction Project Management: Design and Implementation of Jobsite Management System.}
+
+The objective is to develop a centralized web-based platform for managing construction projects and day-to-day jobsite activities. The system should provide facilities for project management, task assignment, workforce management, attendance tracking, material and equipment management, daily reporting, issue tracking, document organization, safety monitoring, quality inspections, and project reporting.
+
+The system should improve coordination between construction stakeholders, reduce dependency on manual processes, and provide timely access to project-related information.
+
+\section{Objectives of the Project}
+The major objectives of the Jobsite Management System are listed in Table~\ref{tab:p1obj}.
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{rY}
+\toprule
+\hrow\textbf{No.} & \textbf{Objective}\\
+\midrule
+1 & Centralize construction project information\\
+2 & Manage construction projects, tasks, schedules, and deadlines\\
+3 & Track workforce, attendance, materials, and equipment\\
+4 & Record daily site activities and project progress\\
+5 & Report, assign, and track construction-related issues\\
+6 & Manage project documents and records\\
+7 & Monitor safety incidents and quality inspections\\
+8 & Provide notifications for important project events\\
+9 & Provide dashboards and reports for project monitoring\\
+10 & Improve communication, coordination, and decision-making\\
+11 & Provide secure access based on user roles\\
+12 & Reduce manual work and improve the accuracy of project information\\
+\bottomrule
+\end{tabularx}
+\caption{Project objectives}\label{tab:p1obj}
+\end{table}
+
+\section{Scope of the Project}
+The Jobsite Management System is designed to manage, monitor, coordinate, and document construction projects through a centralized web application. The system provides a common platform for administrators, project managers, site engineers, workers, contractors, and clients. The scope covers the areas listed in Table~\ref{tab:p1scope}.
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.6cm}Y}
+\toprule
+\hrow\textbf{Scope area} & \textbf{Description}\\
+\midrule
+Project Management & Creation, modification, assignment, and monitoring of construction projects\\
+Task Management & Task creation, assignment, priority, deadlines, and progress tracking\\
+Workforce Management & Worker records, contractor details, and workforce information\\
+Attendance Management & Recording and viewing worker attendance\\
+Material Management & Material records, stock quantities, stock adjustments, and low-stock alerts\\
+Equipment Management & Equipment records, availability, condition, and usage information\\
+Daily Site Reporting & Recording construction activities and daily progress\\
+Issue Management & Reporting, assigning, and tracking construction-related issues\\
+Safety and Quality & Maintaining safety incident and quality inspection records\\
+Dashboard and Analytics & Displaying project statistics, progress, and important information\\
+Notifications & Providing alerts for important project activities\\
+Document Management & Maintaining project document information and supporting future document-management functionality\\
+\bottomrule
+\end{tabularx}
+\caption{Scope areas}\label{tab:p1scope}
+\end{table}
+
+\subsection{Users of the System}
+\textbf{1. Administrator}
+\begin{itemize}
+\item Manages user accounts.
+\item Manages user roles and access permissions.
+\item Monitors system information.
+\item Maintains overall system administration.
+\end{itemize}
+\textbf{2. Project Manager}
+\begin{itemize}
+\item Creates and manages projects.
+\item Assigns tasks.
+\item Monitors project progress.
+\item Manages workforce and resources.
+\item Views reports and project analytics.
+\end{itemize}
+\textbf{3. Site Engineer / Supervisor}
+\begin{itemize}
+\item Records daily site activities.
+\item Manages attendance.
+\item Updates material information.
+\item Monitors equipment.
+\item Reports issues and safety-related information.
+\end{itemize}
+\textbf{4. Worker / Contractor}
+\begin{itemize}
+\item Views assigned tasks.
+\item Updates task status.
+\item Records work progress.
+\item Reports site-related issues.
+\end{itemize}
+\textbf{5. Client}
+\begin{itemize}
+\item Views relevant project information.
+\item Monitors project progress.
+\item Accesses available reports and updates.
+\end{itemize}
+
+\section{Existing System and Proposed Solution}
+\subsection{Existing System}
+In traditional construction project management, information is often maintained through physical registers, spreadsheets, separate software applications, and manual communication. This approach creates several difficulties:
+\begin{itemize}
+\item Scattered project information.
+\item Manual record keeping.
+\item Difficulty tracking task completion.
+\item Inefficient workforce management.
+\item Lack of centralized material records.
+\item Difficulty tracking construction issues.
+\item Delayed communication.
+\item Difficulty accessing historical project information.
+\end{itemize}
+
+\subsection{Proposed System}
+The proposed Jobsite Management System provides a centralized digital platform for managing construction activities. It allows authorized users to create projects, assign tasks, maintain workforce records, record attendance, track material stock, manage equipment, submit daily reports, and monitor issues. The system uses a database to maintain organized records and provides different interfaces according to user roles.
+
+\subsection{Comparison}
+Table~\ref{tab:p1comp} maps each limitation of the existing approach to the corresponding feature of the proposed system.
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{YY}
+\toprule
+\hrow\textbf{Existing limitation} & \textbf{Proposed solution}\\
+\midrule
+Scattered project information & Centralized project database\\
+Manual record keeping & Digital site records\\
+Difficult progress tracking & Task and progress tracking\\
+Poor task coordination & Task assignment and status updates\\
+Inefficient resource management & Workforce, material, and equipment tracking\\
+Difficult issue management & Issue reporting and status tracking\\
+Limited project visibility & Dashboards and analytics\\
+Delayed identification of problems & Notifications and alerts\\
+Communication gaps & Centralized project information\\
+\bottomrule
+\end{tabularx}
+\caption{Existing limitations and proposed solutions}\label{tab:p1comp}
+\end{table}
+\jpartend{I}
+
+%================ PART II ================
+\jpart{II}{System Requirements and SRS}{Hardware \textbullet\ Software \textbullet\ Functional and Non-Functional Requirements \textbullet\ DFD \textbullet\ Data Dictionary}{System Requirements and SRS}
+
+\section{System Requirements}
+\subsection{Hardware Requirements}
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{4.5cm}Y}
+\toprule
+\hrow\textbf{Hardware} & \textbf{Minimum requirement}\\
+\midrule
+Computer / Laptop & Required\\
+Processor & Modern multi-core processor\\
+RAM & Minimum 8 GB recommended\\
+Storage & Minimum 256 GB available storage\\
+Internet & Stable internet connection\\
+Mobile Device & Optional for responsive testing\\
+\bottomrule
+\end{tabularx}
+\caption{Hardware requirements}
+\end{table}
+
+\subsection{Software Requirements}
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{4.5cm}Y}
+\toprule
+\hrow\textbf{Software} & \textbf{Purpose}\\
+\midrule
+Windows / Linux / macOS & Operating system\\
+Visual Studio Code & Source code development\\
+React.js & Frontend development\\
+Node.js & Backend runtime\\
+Express.js & Backend API development\\
+PostgreSQL & Database management\\
+Supabase & Hosted database services\\
+Knex.js & Database query builder and migrations\\
+Postman & API testing\\
+Google Chrome & Application testing\\
+Git / GitHub & Version control\\
+MS Word / Google Docs & Project documentation\\
+\bottomrule
+\end{tabularx}
+\caption{Software requirements}
+\end{table}
+
+\section{Requirement Analysis and SRS}
+Requirement analysis is the process of identifying the functions and constraints of a software system before development. For the Jobsite Management System, the requirements are divided into functional and non-functional requirements.
+
+\subsection{Functional Requirements}
+The system shall:
+\begin{enumerate}[itemsep=1pt]
+\item Provide user registration and login.
+\item Provide role-based access control.
+\item Allow authorized users to create and manage projects.
+\item Allow project managers to assign site engineers.
+\item Allow project managers to create and assign tasks.
+\item Maintain task priorities, deadlines, and completion status.
+\item Maintain worker and contractor information.
+\item Record and retrieve workforce attendance.
+\item Maintain material inventory and stock transactions.
+\item Maintain equipment information and availability.
+\item Allow users to submit daily site reports.
+\item Allow users to report and track construction-related issues.
+\item Maintain safety and quality inspection records.
+\item Provide project dashboards and analytics.
+\item Provide notifications for important project activities.
+\item Allow users to access information according to their roles.
+\end{enumerate}
+
+\subsection{Non-Functional Requirements}
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.2cm}Y}
+\toprule
+\hrow\textbf{Attribute} & \textbf{Requirement}\\
+\midrule
+Security & The system should prevent unauthorized access through authentication and role-based permissions\\
+Performance & Common operations should provide reasonable response times\\
+Usability & The interface should be simple and understandable\\
+Reliability & The system should maintain accurate project information\\
+Availability & The application should be accessible whenever required, subject to hosting availability\\
+Maintainability & The application should be modular and easy to modify\\
+Scalability & The system should support additional users, projects, and records\\
+Data Integrity & The database should maintain consistent and accurate information\\
+\bottomrule
+\end{tabularx}
+\caption{Non-functional requirements}
+\end{table}
+
+\subsection{Context-Level Data Flow Diagram}
+A Context-Level Data Flow Diagram represents the complete Jobsite Management System as a single process and shows the exchange of information between the system and its external users. The main external entities are the Administrator, Project Manager, Site Engineer / Supervisor, Worker / Contractor, and Client. The main data flows are summarized in Table~\ref{tab:p2dfd}.
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.3cm}YY}
+\toprule
+\hrow\textbf{External entity} & \textbf{Data sent to JMS} & \textbf{Data received from JMS}\\
+\midrule
+Administrator & User and role information & User records and system information\\
+Project Manager & Project details, task assignments, report requests & Project progress, task status, reports\\
+Site Engineer & Daily reports, attendance, material updates, issues & Assigned tasks, notifications, project information\\
+Worker & Task progress, attendance, work updates & Assigned tasks, task details, notifications\\
+Client & Information requests & Project progress and available reports\\
+\bottomrule
+\end{tabularx}
+\caption{Context-level data flows}\label{tab:p2dfd}
+\end{table}
+\figph{Context-level data flow diagram of JMS}{2.6cm}
+
+\subsection{Data Dictionary}
+The Data Dictionary (Table~\ref{tab:p2dd}) defines the important data items used in the system.
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.4cm}Yl}
+\toprule
+\hrow\textbf{Data item} & \textbf{Description} & \textbf{Data type}\\
+\midrule
+User\_ID & Unique identification number of a user & Integer\\
+User\_Name & Name of the user & String\\
+Email & Email address of the user & String\\
+Role & Role assigned to the user & String\\
+Project\_ID & Unique identification number of a project & Integer\\
+Project\_Name & Name of the construction project & String\\
+Task\_ID & Unique identification number of a task & Integer\\
+Task\_Status & Current status of a task & String\\
+Worker\_ID & Unique identification number of a worker & Integer\\
+Attendance\_Date & Date on which attendance is recorded & Date\\
+Material\_ID & Unique identification number of a material & Integer\\
+Quantity & Available material quantity & Integer\\
+Equipment\_ID & Unique identification number of equipment & Integer\\
+Issue\_ID & Unique identification number of an issue & Integer\\
+Issue\_Status & Current status of an issue & String\\
+Report\_ID & Unique identification number of a daily report & Integer\\
+Document\_ID & Unique identification number of a project document & Integer\\
+\bottomrule
+\end{tabularx}
+\caption{Data dictionary}\label{tab:p2dd}
+\end{table}
+
+\subsection{Software Requirement Specification}
+The SRS describes the expected behavior and requirements of the Jobsite Management System.
+
+\textbf{Purpose.} To provide a centralized system for construction project management.
+
+\textbf{Scope.} To manage projects, tasks, workforce, attendance, materials, equipment, reports, issues, safety information, and project analytics.
+
+\textbf{Users.} Administrator, Project Manager, Site Engineer, Worker / Contractor, and Client.
+
+\textbf{System constraints.}
+\begin{itemize}
+\item Users require valid credentials to access protected functions.
+\item Access to modules depends on assigned roles.
+\item Database connectivity is required for storing and retrieving records.
+\item The application requires a compatible web browser.
+\end{itemize}
+\jpartend{II}
+
+%================ PART III ================
+\jpart{III}{System Design and Modelling}{Data Design \textbullet\ Architecture \textbullet\ Transform and Transaction Mapping \textbullet\ User Interface \textbullet\ Component Design \textbullet\ UML}{System Design and Modelling}
+
+System design describes the architecture, database structure, user interface, and internal working of the application.
+
+\section{Data Design}
+The system uses a relational database to store project-related information. The main database entities include:
+\begin{multicols}{2}
+\begin{itemize}
+\item Users
+\item Projects
+\item Tasks
+\item Workers
+\item Attendance
+\item Materials
+\item Equipment
+\item Daily Reports
+\item Issues
+\item Documents
+\item Safety Records
+\item Material Transactions
+\item Equipment Logs
+\end{itemize}
+\end{multicols}
+Primary keys are used to uniquely identify records, while foreign keys establish relationships between related tables. The database uses referential integrity to maintain consistency between projects, tasks, users, attendance, materials, and other records.
+
+\section{Architectural Design}
+The Jobsite Management System follows a three-tier architecture, summarized in Table~\ref{tab:p3arch}.
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{2.7cm}>{\raggedright\arraybackslash}p{3.2cm}Y}
+\toprule
+\hrow\textbf{Tier} & \textbf{Technology} & \textbf{Responsibility}\\
+\midrule
+Presentation Layer & React.js & User interface through which users interact with the application; pages for login, dashboard, projects, tasks, workforce, materials, equipment, reports, issues, and safety\\
+Application Layer & Node.js, Express.js & Business logic, API requests, validation, authentication, authorization, and communication with the database\\
+Database Layer & PostgreSQL (hosted through Supabase) & Stores and manages the information required by the system\\
+\bottomrule
+\end{tabularx}
+\caption{Architectural tiers}\label{tab:p3arch}
+\end{table}
+\figph{Three-tier architecture of JMS}{2.8cm}
+
+\section{Transform Mapping}
+Transform mapping is used when input data passes through a sequence of processing operations to generate meaningful output. In JMS, information such as attendance, material usage, task progress, and daily activities is received, validated, processed, and stored. The processed information is then used to generate reports, summaries, and project progress information.
+
+\textbf{Architectural flow:}
+\begin{center}
+Input Data $\rightarrow$ Validation $\rightarrow$ Processing $\rightarrow$ Database Operations $\rightarrow$ Output / Reports
+\end{center}
+\figph{Transform mapping diagram}{3.2cm}
+
+\section{Transaction Mapping}
+Transaction mapping is used when different types of requests are directed to their respective processing modules. In JMS, user requests are identified and routed to the appropriate modules:
+\begin{multicols}{2}
+\begin{itemize}
+\item Authentication Module
+\item Project Management Module
+\item Task Management Module
+\item Workforce Management Module
+\item Material Management Module
+\item Equipment Management Module
+\item Reporting Module
+\item Issue Management Module
+\end{itemize}
+\end{multicols}
+Each module processes the request and returns an appropriate response.
+\figph{Transaction mapping diagram}{3.2cm}
+
+\section{User Interface Design}
+The user interface is designed to provide simple navigation and easy access to important construction project information. The application includes:
+\begin{itemize}
+\item Login and registration page.
+\item Dashboard.
+\item Project management page.
+\item Task management page.
+\item Workforce and attendance page.
+\item Inventory and equipment page.
+\item Reports and issues page.
+\item Safety management page.
+\end{itemize}
+The interface provides role-based navigation so that users can access the modules relevant to their responsibilities.
+\figph{Application screenshots}{2.8cm}
+
+\section{Procedural / Component-Level Design}
+The system is divided into individual components and modules, each performing a specific responsibility (Table~\ref{tab:p3comp}).
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.2cm}Y}
+\toprule
+\hrow\textbf{Component} & \textbf{Responsibility}\\
+\midrule
+Authentication & Login, registration, password verification, and session management\\
+Project & Project creation, modification, and assignment\\
+Task & Task creation, assignment, and progress updates\\
+Workforce & Worker registration and workforce information\\
+Attendance & Recording and retrieving attendance\\
+Material & Material registration and inventory updates\\
+Equipment & Equipment records and availability\\
+Reports & Daily site report management\\
+Issues & Reporting and tracking issues\\
+Safety & Safety and quality record management\\
+Dashboard & Project summaries and analytics\\
+Notifications & Important activity alerts\\
+\bottomrule
+\end{tabularx}
+\caption{Major components}\label{tab:p3comp}
+\end{table}
+
+\section{UML Modelling}
+Unified Modeling Language (UML) is used to represent the structure and behavior of the system. The diagrams considered for the design are described in Table~\ref{tab:p3uml}.
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.2cm}Y}
+\toprule
+\hrow\textbf{Diagram} & \textbf{What it represents}\\
+\midrule
+Use Case Diagram & Interactions between the administrator, project manager, site engineer, worker, and client with the system\\
+Class Diagram & Important entities such as User, Project, Task, Worker, Material, Equipment, Attendance, and Issue\\
+Sequence Diagram & Sequence of interactions between the user interface, backend components, and database during operations such as login authentication\\
+Activity Diagram & Workflows such as project creation, task assignment, and attendance recording\\
+\bottomrule
+\end{tabularx}
+\caption{UML diagrams}\label{tab:p3uml}
+\end{table}
+\figph{Use case diagram}{2.2cm}
+\figph{Class diagram}{2.2cm}
+\figph{Sequence diagram: login authentication}{2.2cm}
+\figph{Activity diagram}{2.2cm}
+\jpartend{III}
+
+%================ PART IV ================
+\jpart{IV}{Resource Estimation}{Human \textbullet\ Hardware \textbullet\ Software \textbullet\ Database and Storage}{Resource Estimation}
+
+Resource estimation identifies the human, hardware, software, database, and other resources required to develop the Jobsite Management System.
+
+\section{Human Resources}
+The project group consists of four students (Table~\ref{tab:p4hr}).
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{4.2cm}>{\raggedright\arraybackslash}p{2.6cm}Y}
+\toprule
+\hrow\textbf{Resource} & \textbf{Requirement} & \textbf{Responsibility}\\
+\midrule
+Student Developers & 4 & Design, development, testing, and integration\\
+Project Coordinator & 1 group member & Planning and coordination\\
+Frontend Development & Shared & User interface development\\
+Backend Development & Shared & APIs and business logic\\
+Database Management & Shared & Database design and maintenance\\
+Testing and Documentation & All members & Testing, documentation, and presentation\\
+Project Guide & 1 & Guidance and review\\
+\bottomrule
+\end{tabularx}
+\caption{Human resources}\label{tab:p4hr}
+\end{table}
+
+\section{Hardware Resources}
+\begin{itemize}
+\item Four computers or laptops.
+\item Stable internet connection.
+\item Local or cloud server, if required.
+\item Optional mobile devices for responsive testing.
+\item Local or cloud storage for project files and backups.
+\end{itemize}
+
+\section{Software Resources}
+\begin{multicols}{2}
+\begin{itemize}
+\item Visual Studio Code
+\item React.js
+\item Node.js
+\item Express.js
+\item PostgreSQL
+\item Supabase
+\item Git and GitHub
+\item Postman
+\item Google Chrome
+\item MS Word / Google Docs
+\end{itemize}
+\end{multicols}
+
+\section{Database and Storage Resources}
+A PostgreSQL database is used for storing user information, projects, tasks, workforce, attendance, materials, equipment, reports, issues, and safety records. Supabase provides hosted database connectivity. Database migrations are maintained using Knex.js. Regular backups and proper access control are important for maintaining data security and integrity.
+
+\section{Resource Summary}
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{4.2cm}Y}
+\toprule
+\hrow\textbf{Resource category} & \textbf{Estimated requirement}\\
+\midrule
+Human Resources & 4 students and 1 project guide\\
+Computers & 4 laptops / desktops\\
+Internet & Required\\
+Database & 1 development database\\
+Development Tools & IDE and programming frameworks\\
+Version Control & Git and GitHub\\
+Testing Tools & Postman and browser tools\\
+Documentation & Word processor and diagramming tools\\
+Hosting & Local or cloud deployment\\
+Storage & Local / cloud storage\\
+\bottomrule
+\end{tabularx}
+\caption{Resource summary}
+\end{table}
+\jpartend{IV}
+
+%================ PART V ================
+\jpart{V}{Effort Estimation}{LOC-Based Estimation \textbullet\ FP-Based Estimation \textbullet\ COCOMO Model}{Effort Estimation}
+
+Software effort estimation is the process of estimating the amount of work required to develop the application. For JMS, three estimation techniques were considered: Lines of Code (LOC) based estimation, Function Point (FP) based estimation, and COCOMO-based estimation.
+
+\section{LOC-Based Estimation}
+The LOC method estimates development effort based on the expected number of source-code lines. The three-point PERT formula is
+\[
+\text{Expected LOC} = \frac{O + 4M + P}{6},
+\]
+where $O$ is the optimistic estimate, $M$ the most likely estimate, and $P$ the pessimistic estimate.
+
+The estimated application size is approximately 6,468 LOC. Assuming a productivity of 12 LOC per person-hour,
+\[
+\text{Effort} = \frac{6{,}468}{12} \approx 539 \text{ person-hours}.
+\]
+
+\section{Function Point Estimation}
+Function Point estimation measures software size based on the functionality provided to users. The following components are considered:
+\begin{itemize}
+\item External Inputs (EI)
+\item External Outputs (EO)
+\item External Inquiries (EQ)
+\item Internal Logical Files (ILF)
+\item External Interface Files (EIF)
+\end{itemize}
+The estimated size from the assignment is approximately 215.2 Function Points. Assuming the estimated productivity, the effort is approximately 861 person-hours.
+
+\section{COCOMO Estimation}
+The Constructive Cost Model (COCOMO) is used to estimate software development effort based on software size and project characteristics. Basic COCOMO is considered as a reference, while COCOMO II Application Composition is used as the more suitable estimation model for a framework-based academic web application. The estimated COCOMO II effort is approximately 669 person-hours.
+
+\section{Comparison of Estimation Techniques}
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{4.2cm}>{\raggedright\arraybackslash}p{4cm}Y}
+\toprule
+\hrow\textbf{Technique} & \textbf{Estimated size} & \textbf{Effort}\\
+\midrule
+LOC-Based & 6,468 LOC & 539 hours\\
+Function Point & 215.2 FP & 861 hours\\
+COCOMO II & 88 Object Points & 669 hours\\
+Basic COCOMO & 6.5 KLOC & 2,590 hours\\
+\bottomrule
+\end{tabularx}
+\caption{Effort by estimation technique}
+\end{table}
+
+\section{Final Effort Estimate}
+The average of the three adopted estimation techniques is approximately
+\[
+\frac{539 + 861 + 669}{3} \approx 690 \text{ person-hours}.
+\]
+The practical planning range considered in the estimation assignment is approximately 552--793 person-hours.
+
+The estimate is a planning baseline rather than a measured record of actual hours. The original estimation worksheet assumed five student developers; the actual project group consists of four students. Therefore, the effort distribution should be adjusted according to the actual team size and availability.
+\jpartend{V}
+
+%================ PART VI ================
+\jpart{VI}{System Implementation}{Technology Stack \textbullet\ Frontend \textbullet\ Backend \textbullet\ Database \textbullet\ Modules \textbullet\ Security}{System Implementation}
+
+The Jobsite Management System has been implemented as a web-based application using a frontend, backend, and relational database.
+
+\section{Technology Stack}
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{4.2cm}Y}
+\toprule
+\hrow\textbf{Technology} & \textbf{Purpose}\\
+\midrule
+React.js & Frontend user interface\\
+React Router & Navigation and routing\\
+Axios & API communication\\
+Node.js & Backend runtime environment\\
+Express.js & REST API development\\
+PostgreSQL & Relational database\\
+Supabase & Hosted database platform\\
+Knex.js & Database queries and migrations\\
+JWT & Authentication\\
+bcryptjs & Password hashing\\
+Recharts & Charts and analytics\\
+QR Code Libraries & QR generation and scanning\\
+Vite & Frontend development and build tool\\
+\bottomrule
+\end{tabularx}
+\caption{Technology stack}
+\end{table}
+
+\section{Frontend Implementation}
+The frontend is developed using React.js. It provides an interactive interface for users to access different features of the application. The frontend uses React Router for navigation and protected routes for authentication. Axios is used to communicate with the backend API. Authentication tokens are attached to API requests, and unauthorized sessions are handled by the API client. The frontend includes role-based navigation and separate pages for major modules.
+
+\section{Backend Implementation}
+The backend is developed using Node.js and Express.js. It provides REST API endpoints for the different modules of the application. The backend is organized into:
+\begin{multicols}{2}
+\begin{itemize}
+\item Controllers
+\item Models
+\item Routes
+\item Middleware
+\item Validators
+\item Services
+\item Database Configuration
+\item Migrations
+\end{itemize}
+\end{multicols}
+This modular structure improves code organization, maintainability, and reusability.
+
+\section{Database Implementation}
+PostgreSQL is used as the relational database, with Supabase providing the hosted database environment. Knex.js is used for database queries and schema migrations. The database contains tables for users, projects, tasks, workers, attendance, materials, equipment, daily reports, issues, documents, safety records, and material-related transactions and logs. Foreign keys and database constraints are used to maintain data relationships and consistency.
+
+\section{Main Implemented Modules}
+\subsection{Authentication and User Management}
+This module handles user registration, login, password verification, and authentication. JWT is used for authentication, and bcryptjs is used for password hashing. The application supports the roles Admin, Project Manager, Site Engineer, Worker, and Client. Role-based access control restricts access to protected application functions.
+
+\subsection{Project Management}
+This module allows authorized users to create and manage construction projects. It maintains the project name, location, start date, end date, project manager, and project status. It also supports assignment of site engineers to projects.
+
+\subsection{Task Management}
+This module allows project managers to create and assign tasks. It maintains the task title, project association, assigned user, priority, deadline, task status, and completion percentage. Workers can update the progress of tasks assigned to them, subject to authorization rules.
+
+\subsection{Workforce and Attendance Management}
+This module maintains worker and contractor information. It allows authorized users to register workers and retrieve workforce records. The attendance feature supports recording attendance for individual workers or multiple workers and retrieving attendance records according to project and date.
+
+\subsection{Material and Inventory Management}
+This module manages construction materials and inventory information. It supports:
+\begin{multicols}{2}
+\begin{itemize}
+\item Material registration
+\item Stock quantity tracking
+\item Material stock adjustments
+\item Minimum stock levels
+\item Low-stock identification
+\item Material transaction records
+\item Material usage logs
+\end{itemize}
+\end{multicols}
+The system prevents stock quantities from becoming negative and provides low-stock alerts when the available quantity reaches the minimum threshold.
+
+\subsection{Equipment Management}
+This module maintains equipment information associated with construction projects. It supports equipment registration, availability tracking, condition updates, and equipment-related logs.
+
+\subsection{Daily Site Reporting}
+This module allows authorized users to create daily site reports and retrieve reports associated with a project. Reports are maintained with their dates and creator information.
+
+\subsection{Issue Management}
+This module allows users to report construction-related issues. It supports issue tracking and status updates. The available issue statuses are Open, In Progress, and Resolved. Authorized users can manage the status of reported issues.
+
+\subsection{Safety and Quality Management}
+This module maintains safety incidents and quality inspection records. It provides facilities to record and retrieve safety and quality information associated with construction projects.
+
+\subsection{Dashboard and Analytics}
+The dashboard provides a summarized view of important project information. The application includes analytical features related to project progress, inventory, material consumption, safety, and quality. Charts and visual summaries help users understand project conditions and identify important information.
+
+\subsection{Notifications and QR Features}
+The backend includes notification functionality for important project events. The application also contains QR code generation and scanning components to support identification and related actions for project resources.
+
+\section{Database Security}
+The backend uses authentication middleware and role-based authorization to protect API endpoints. The application uses environment variables for configuration and database connectivity. Database Row Level Security (RLS) is enabled through the database migrations to restrict direct access through the Supabase public Data API.
+\jpartend{VI}
+
+%================ PART VII ================
+\jpart{VII}{Software Quality Assurance}{Quality Objectives \textbullet\ Activities \textbullet\ Defect Management \textbullet\ Metrics}{Software Quality Assurance}
+
+Software Quality Assurance (SQA) is the process of ensuring that the developed software satisfies its requirements and maintains the expected quality. The SQA plan for JMS covers requirement analysis, design, development, testing, defect management, and final validation.
+
+\section{Quality Objectives}
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{3.4cm}Y}
+\toprule
+\hrow\textbf{Quality attribute} & \textbf{Objective}\\
+\midrule
+Correctness & The system should perform functions according to requirements\\
+Reliability & The application should operate consistently\\
+Usability & Users should be able to understand and use the application easily\\
+Security & User accounts and project information should be protected\\
+Performance & Common operations should have acceptable response times\\
+Maintainability & The source code should be organized and easy to modify\\
+Compatibility & The application should work on supported browsers\\
+Data Integrity & Project information should remain accurate and consistent\\
+\bottomrule
+\end{tabularx}
+\caption{Quality objectives}
+\end{table}
+
+\section{Quality Assurance Activities}
+The following activities are considered:
+\begin{multicols}{2}
+\begin{enumerate}[itemsep=1pt]
+\item Requirement review
+\item System design review
+\item Source-code review
+\item Unit testing
+\item Integration testing
+\item System testing
+\item Security testing
+\item Usability testing
+\item Regression testing
+\item User acceptance testing
+\end{enumerate}
+\end{multicols}
+
+\section{Defect Management}
+Identified defects are classified according to severity (Table~\ref{tab:p7sev}).
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{2.4cm}Y}
+\toprule
+\hrow\textbf{Severity} & \textbf{Description}\\
+\midrule
+Critical & Prevents major system operations or causes serious data or security problems\\
+High & Important functionality does not work correctly\\
+Medium & Functionality works partially or has noticeable defects\\
+Low & Minor interface or non-critical issues\\
+\bottomrule
+\end{tabularx}
+\caption{Defect severity levels}\label{tab:p7sev}
+\end{table}
+
+\section{Quality Metrics}
+The following metrics can be used to evaluate software quality:
+\begin{itemize}
+\item Number of test cases executed.
+\item Number of passed and failed test cases.
+\item Number of defects identified.
+\item Number of defects resolved.
+\item Requirement-to-test-case coverage.
+\item Number of regression defects.
+\item Response time of important operations.
+\end{itemize}
+\jpartend{VII}
+
+%================ PART VIII ================
+\jpart{VIII}{Testing and Validation}{Unit Testing \textbullet\ Basis Path Testing \textbullet\ Control Flow Graphs \textbullet\ Test Cases}{Testing and Validation}
+
+Testing is performed to verify that the Jobsite Management System behaves according to its specified requirements. The project considers unit testing, integration testing, system testing, security testing, and user acceptance testing.
+
+\section{Unit Testing}
+Unit testing verifies individual functions and components independently. The main modules selected for testing are User Authentication, Project Management, Task Management, Workforce and Attendance Management, and Material Management.
+
+\section{Basis Path Testing}
+Basis Path Testing is a white-box testing technique used to identify and test independent execution paths in a program. It uses a Control Flow Graph (CFG) to represent program execution and Cyclomatic Complexity to calculate the number of independent paths. The formula used is
+\[
+V(G) = E - N + 2P,
+\]
+where $V(G)$ is the cyclomatic complexity, $E$ the number of edges, $N$ the number of nodes, and $P$ the number of connected components. For a single connected control flow graph, another formula is
+\[
+V(G) = D + 1,
+\]
+where $D$ is the number of decision nodes.
+
+\section{Modules Selected for Basis Path Testing}
+\begin{table}[H]
+\tablestyle
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{4.2cm}Y}
+\toprule
+\hrow\textbf{Module} & \textbf{Purpose}\\
+\midrule
+User Authentication & Verify user credentials and account status\\
+Project Management & Verify project creation and manager assignment\\
+Task Management & Verify project and task assignment conditions\\
+Workforce Management & Verify attendance and worker records\\
+Material Management & Verify stock updates and inventory conditions\\
+\bottomrule
+\end{tabularx}
+\caption{Modules selected for basis path testing}
+\end{table}
+
+\section{Test Case Summary}
+\begin{center}
+\small\renewcommand{\arraystretch}{1.25}
+\begin{longtable}{>{\raggedright\arraybackslash}p{2.1cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{4.6cm}>{\raggedright\arraybackslash}p{4.2cm}}
+\toprule
+\rowcolor{gray!14}\textbf{Test ID} & \textbf{Module} & \textbf{Test condition} & \textbf{Expected result}\\
+\midrule
+\endfirsthead
+\toprule
+\rowcolor{gray!14}\textbf{Test ID} & \textbf{Module} & \textbf{Test condition} & \textbf{Expected result}\\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+AUTH\_01 & Authentication & Unregistered email & Invalid credentials\\
+AUTH\_02 & Authentication & Incorrect password & Invalid credentials\\
+AUTH\_03 & Authentication & Deactivated account & Access denied\\
+AUTH\_04 & Authentication & Valid active account & Login successful\\
+PROJ\_01 & Project & Manager ID not provided & Current user assigned\\
+PROJ\_02 & Project & Valid manager ID & Project created\\
+PROJ\_03 & Project & Invalid manager ID & Error returned\\
+TASK\_01 & Task & Non-existing project & Project not found\\
+TASK\_02 & Task & Invalid task details & Validation error, if applicable\\
+TASK\_03 & Task & Invalid assigned user & Assignment error\\
+TASK\_04 & Task & Valid project and assignment & Task created\\
+WORK\_01 & Workforce & Non-existing project & Project not found\\
+WORK\_02 & Workforce & Empty attendance records & Error returned\\
+WORK\_03 & Workforce & Invalid worker ID & Worker not found\\
+WORK\_04 & Workforce & Valid attendance records & Attendance recorded\\
+MAT\_01 & Material & Invalid material ID & Invalid ID error\\
+MAT\_02 & Material & Non-existing material & Material not found\\
+MAT\_03 & Material & Invalid stock quantity & Validation error\\
+MAT\_04 & Material & Stock reduction below zero & Stock update rejected\\
+MAT\_05 & Material & Valid stock adjustment & Stock updated\\
+\end{longtable}
+\end{center}
+\vspace{-6pt}
+\textit{Note:} The above test cases represent the logical test scenarios prepared for the experiment. Actual execution results should be recorded separately after running the corresponding test functions or API requests.
+
+\section{Control Flow Graphs}
+Control Flow Graphs are prepared for the selected modules to identify their independent execution paths. The following diagrams are included for the five selected modules.
+\figph{User Authentication CFG}{2.6cm}
+\figph{Project Management CFG}{2.6cm}
+\figph{Task Management CFG}{2.6cm}
+\figph{Workforce and Attendance CFG}{2.6cm}
+\figph{Material Management CFG}{2.6cm}
+
+\section{Test Execution}
+The backend project contains Node.js test scripts for authentication and several feature-testing phases. The package configuration includes commands for executing the available tests:
+\begin{multicols}{2}
+\begin{itemize}
+\item \texttt{npm run test:auth}
+\item \texttt{npm run test:phase3}
+\item \texttt{npm run test:phase4}
+\item \texttt{npm run test:phase5}
+\item \texttt{npm run test:features}
+\item \texttt{npm run test:progress}
+\item \texttt{npm run test:innovations}
+\item \texttt{npm test}
+\end{itemize}
+\end{multicols}
+These scripts can be used to execute the available backend test suites after configuring the required database and environment variables. Test execution should be performed using valid and invalid input data. The actual responses should be compared with the expected results and any identified defects should be recorded.
+\jpartend{VIII}
+
+%================ PART IX ================
+\jpart{IX}{Conclusion and Future Scope}{Results \textbullet\ Limitations \textbullet\ Future Scope \textbullet\ Conclusion}{Conclusion and Future Scope}
+
+\section{Results and Discussion}
+The Jobsite Management System was developed as a centralized web-based application for managing construction-related activities. The project combines the major concepts of software engineering, including requirement analysis, scope definition, resource estimation, effort estimation, system design, implementation, quality assurance, and testing.
+
+The implemented application provides the following major capabilities:
+\begin{enumerate}[itemsep=1pt]
+\item User registration and authentication.
+\item Role-based access control.
+\item Project creation and management.
+\item Task creation and progress tracking.
+\item Workforce registration and attendance.
+\item Material inventory and stock management.
+\item Equipment information and availability management.
+\item Daily site reporting.
+\item Issue reporting and tracking.
+\item Safety and quality record management.
+\item Dashboard and analytical information.
+\item Notifications and QR-related features.
+\end{enumerate}
+The modular architecture separates frontend components, backend APIs, business logic, and database operations. The testing plan identifies important logical conditions and provides test cases for verifying valid and invalid execution paths. The final application provides a foundation for centralized construction project information management and can be extended with additional functionality.
+
+\section{Limitations}
+Although the Jobsite Management System provides several useful features, certain limitations remain.
+\begin{enumerate}[itemsep=1pt]
+\item The application requires internet connectivity for hosted database operations.
+\item The system depends on the availability of the backend server and database.
+\item Advanced financial management and automated billing are not included in the current project scope.
+\item Full integration with external construction and engineering platforms is not included.
+\item Advanced predictive analytics and artificial intelligence capabilities are limited.
+\item Native mobile application and offline operation are not included in the current implementation.
+\item Advanced document version control and complete document workflow management can be further developed.
+\item Some advanced reporting and monitoring capabilities may require additional development.
+\end{enumerate}
+
+\section{Future Scope}
+The Jobsite Management System has considerable potential for further development. The following features can be added in future versions to improve its functionality, automation, and usefulness.
+
+\subsection{Mobile Application}
+A dedicated Android and iOS application can be developed for site engineers, supervisors, workers, and contractors. This would allow field staff to update task progress, record attendance, upload photographs, and report issues directly from construction sites.
+
+\subsection{Offline Functionality}
+Offline functionality can be introduced so that users can record site activities even when internet connectivity is unavailable. The stored information can automatically synchronize with the central database once an internet connection becomes available.
+
+\subsection{Artificial Intelligence and Predictive Analytics}
+AI-based features can be integrated to analyze historical project information and predict possible project delays, material shortages, and budget overruns. Machine learning techniques can help project managers make better decisions using historical data.
+
+\subsection{Building Information Modeling (BIM) Integration}
+The system can be integrated with BIM software to provide 3D visualization of construction projects. This would help project managers and engineers understand project layouts, construction progress, and design-related information.
+
+\subsection{IoT Integration}
+IoT devices and sensors can be integrated to monitor construction site conditions in real time. Possible applications include worker safety monitoring, environmental condition monitoring, equipment tracking, temperature and humidity monitoring, and site security monitoring.
+
+\subsection{Advanced Financial Management}
+Future versions can include financial management features such as budget planning, expense tracking, automated billing, invoice generation, contractor payments, cost estimation, and budget-versus-actual analysis.
+
+\subsection{Advanced Notification System}
+The notification system can be extended with email, SMS, and mobile push notifications. Users can receive automatic alerts about deadlines, overdue tasks, low inventory, equipment maintenance, safety incidents, and pending approvals.
+
+\subsection{Advanced Document Management}
+Document management can be enhanced with version control, approval workflows, digital signatures, document access permissions, and automatic document categorization.
+
+\subsection{Advanced Reporting}
+Additional reporting features can be introduced to provide detailed information about project cost and budget, workforce productivity, material consumption, equipment utilization, project completion estimates, safety performance, and quality inspection results.
+
+\subsection{Integration with External Systems}
+The application can be integrated with accounting software, procurement systems, HR management systems, construction planning tools, and other enterprise applications. These integrations would help create a more comprehensive construction project management platform.
+
+\section{Conclusion}
+The Jobsite Management System was designed and developed to provide a centralized platform for managing construction projects and day-to-day jobsite activities. The project addresses common problems in traditional construction management, such as scattered information, manual record keeping, inefficient task coordination, difficulty tracking workforce and materials, and delayed identification of construction-related issues.
+
+During the project, different software engineering activities were carried out, including problem identification, requirement analysis, scope definition, resource estimation, effort estimation, system design, implementation, quality assurance, and testing. The system was implemented using React.js for the frontend, Node.js and Express.js for the backend, and PostgreSQL with Supabase for database management.
+
+The application provides important features such as user authentication, role-based access control, project management, task management, workforce and attendance management, material inventory, equipment management, daily site reporting, issue tracking, safety and quality records, dashboards, and analytics. The use of a modular architecture helps organize the application into separate components, making the system easier to maintain, test, and extend. Database relationships and access-control mechanisms help maintain the consistency and security of project information.
+
+Basis Path Testing was also studied and applied to selected logical modules to identify independent execution paths and prepare appropriate test cases.
+
+Overall, the Jobsite Management System demonstrates the practical application of software engineering concepts in solving real-world construction management problems. It provides a foundation for improving project coordination, information management, resource monitoring, and decision-making. With further development and integration of advanced technologies such as artificial intelligence, mobile applications, IoT, and BIM, the system can be expanded into a more comprehensive construction management solution.
+\jpartend{IX}
+
+%================ REFERENCES ================
+\clearpage
+\renewcommand{\hdrtitle}{References}
+\addcontentsline{toc}{part}{References}
+\section*{References}
+\begin{enumerate}[itemsep=3pt]
+\item Ian Sommerville, \textit{Software Engineering}, Pearson Education.
+\item Roger S. Pressman and Bruce R. Maxim, \textit{Software Engineering: A Practitioner's Approach}, McGraw-Hill.
+\item React Documentation -- \url{https://react.dev/}
+\item Node.js Documentation -- \url{https://nodejs.org/docs/}
+\item Express.js Documentation -- \url{https://expressjs.com/}
+\item PostgreSQL Documentation -- \url{https://www.postgresql.org/docs/}
+\item Supabase Documentation -- \url{https://supabase.com/docs}
+\item Knex.js Documentation -- \url{https://knexjs.org/}
+\item Mermaid Documentation -- \url{https://mermaid.js.org/}
+\item Software Engineering Laboratory assignments and project development records.
+\end{enumerate}
+
+\end{document}
