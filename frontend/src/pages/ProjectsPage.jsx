@@ -34,6 +34,7 @@ export default function ProjectsPage() {
     status: 'in_progress',
     start_date: new Date().toISOString().split('T')[0],
     end_date: '',
+    site_engineer_email: '',
   });
 
   // Edit Project State
@@ -44,7 +45,8 @@ export default function ProjectsPage() {
   const [engineersModalProject, setEngineersModalProject] = useState(null);
   const [assignedEngineers, setAssignedEngineers] = useState([]);
   const [loadingEngineers, setLoadingEngineers] = useState(false);
-  const [targetEngineerId, setTargetEngineerId] = useState('');
+  const [targetEngineerEmail, setTargetEngineerEmail] = useState('');
+  const [availableEngineers, setAvailableEngineers] = useState([]);
 
   const loadProjects = useCallback(async () => {
     setLoading(true);
@@ -60,9 +62,24 @@ export default function ProjectsPage() {
     }
   }, [statusFilter, showToast]);
 
+  const fetchAvailableEngineers = useCallback(async () => {
+    try {
+      const res = await projectApi.getAvailableEngineers();
+      setAvailableEngineers(res.data?.engineers || []);
+    } catch {
+      // ignore
+    }
+  }, []);
+
   useEffect(() => {
     loadProjects();
   }, [loadProjects]);
+
+  useEffect(() => {
+    if (isCreateOpen || engineersModalProject) {
+      fetchAvailableEngineers();
+    }
+  }, [isCreateOpen, engineersModalProject, fetchAvailableEngineers]);
 
   const handleCreateProject = async (e) => {
     e.preventDefault();
@@ -74,10 +91,17 @@ export default function ProjectsPage() {
         throw new Error('End date cannot precede start date');
       }
 
-      const res = await projectApi.create({
+      const payload = {
         ...newProject,
         manager_id: user.id,
-      });
+      };
+      if (!payload.site_engineer_email?.trim()) {
+        delete payload.site_engineer_email;
+      } else {
+        payload.site_engineer_email = payload.site_engineer_email.trim();
+      }
+
+      const res = await projectApi.create(payload);
 
       const createdProj = res.data?.project || res.data?.data;
       if (createdProj?.id) {
@@ -93,6 +117,7 @@ export default function ProjectsPage() {
         status: 'in_progress',
         start_date: new Date().toISOString().split('T')[0],
         end_date: '',
+        site_engineer_email: '',
       });
       loadProjects();
     } catch (err) {
@@ -141,10 +166,14 @@ export default function ProjectsPage() {
   const handleOpenEngineers = async (project) => {
     setEngineersModalProject(project);
     setLoadingEngineers(true);
-    setTargetEngineerId('');
+    setTargetEngineerEmail('');
     try {
-      const res = await projectApi.getEngineers(project.id);
+      const [res, avail] = await Promise.all([
+        projectApi.getEngineers(project.id),
+        projectApi.getAvailableEngineers().catch(() => ({ data: { engineers: [] } })),
+      ]);
       setAssignedEngineers(res.data?.engineers || []);
+      setAvailableEngineers(avail.data?.engineers || []);
     } catch (err) {
       showToast('error', 'Failed to load assigned engineers');
     } finally {
@@ -155,13 +184,13 @@ export default function ProjectsPage() {
   // Assign Engineer to Project
   const handleAssignEngineer = async (e) => {
     e.preventDefault();
-    if (!engineersModalProject || !targetEngineerId) return;
+    if (!engineersModalProject || !targetEngineerEmail.trim()) return;
     try {
       await projectApi.assignEngineer(engineersModalProject.id, {
-        site_engineer_id: Number(targetEngineerId),
+        email: targetEngineerEmail.trim(),
       });
-      showToast('success', 'Site engineer assigned to project');
-      setTargetEngineerId('');
+      showToast('success', `Site engineer "${targetEngineerEmail.trim()}" assigned to project`);
+      setTargetEngineerEmail('');
       const res = await projectApi.getEngineers(engineersModalProject.id);
       setAssignedEngineers(res.data?.engineers || []);
     } catch (err) {
@@ -411,6 +440,22 @@ export default function ProjectsPage() {
                   </div>
                 </div>
                 <div className="form-group">
+                  <label className="form-label">Assign Site Engineer (Email - Optional)</label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    placeholder="e.g. engineer@jobsite.com"
+                    value={newProject.site_engineer_email}
+                    onChange={(e) =>
+                      setNewProject({ ...newProject, site_engineer_email: e.target.value })
+                    }
+                    list="available-site-engineers"
+                  />
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                    Optionally assign a registered site engineer by their email address directly.
+                  </div>
+                </div>
+                <div className="form-group">
                   <label className="form-label">Initial Project Status</label>
                   <select
                     className="form-select"
@@ -578,17 +623,17 @@ export default function ProjectsPage() {
               {/* Assign Form */}
               <form onSubmit={handleAssignEngineer} style={{ marginBottom: '1.5rem' }}>
                 <label className="form-label" style={{ fontWeight: 600 }}>
-                  Assign Site Engineer by User ID
+                  Assign Site Engineer by Email
                 </label>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <input
-                    type="number"
-                    min="1"
+                    type="email"
                     className="form-control"
-                    placeholder="Enter site engineer user ID (e.g. 2, 3)"
-                    value={targetEngineerId}
-                    onChange={(e) => setTargetEngineerId(e.target.value)}
+                    placeholder="Enter site engineer's email (e.g. engineer@jobsite.com)"
+                    value={targetEngineerEmail}
+                    onChange={(e) => setTargetEngineerEmail(e.target.value)}
                     required
+                    list="available-site-engineers"
                   />
                   <button type="submit" className="btn btn-primary" style={{ flexShrink: 0 }}>
                     <UserPlus size={15} /> Assign
@@ -598,6 +643,15 @@ export default function ProjectsPage() {
                   User must have the role 'site_engineer' in the system.
                 </div>
               </form>
+
+              {/* Datalist for available engineers autocomplete */}
+              <datalist id="available-site-engineers">
+                {availableEngineers.map((eng) => (
+                  <option key={eng.id} value={eng.email}>
+                    {eng.name} ({eng.email})
+                  </option>
+                ))}
+              </datalist>
 
               {/* Current List */}
               <div>
@@ -614,7 +668,7 @@ export default function ProjectsPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     {assignedEngineers.map((eng) => (
                       <div
-                        key={eng.id || eng.site_engineer_id}
+                        key={eng.assignment_id || eng.id || eng.site_engineer_id}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -630,7 +684,7 @@ export default function ProjectsPage() {
                             {eng.engineer_name || eng.name || `Engineer #${eng.site_engineer_id || eng.id}`}
                           </div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                            ID: #{eng.site_engineer_id || eng.id} {eng.email ? `• ${eng.email}` : ''}
+                            {eng.email ? `Email: ${eng.email}` : `ID: #${eng.site_engineer_id || eng.id}`}
                           </div>
                         </div>
                         <button
@@ -642,7 +696,7 @@ export default function ProjectsPage() {
                             border: 'none',
                             padding: '0.35rem',
                           }}
-                          onClick={() => handleRemoveEngineer(eng.site_engineer_id || eng.id)}
+                          onClick={() => handleRemoveEngineer(eng.site_engineer_id || eng.user_id || eng.id)}
                           title="Remove engineer from project"
                         >
                           <Trash2 size={16} />

@@ -31,7 +31,7 @@ async function findById(id) {
     .first();
 }
 
-async function findAll({ status, manager_id, isClient = false } = {}) {
+async function findAll({ status, manager_id, site_engineer_id, isClient = false } = {}) {
   const query = db(TABLE)
     .select(
       ...BASE_COLUMNS,
@@ -50,6 +50,14 @@ async function findAll({ status, manager_id, isClient = false } = {}) {
 
   if (manager_id) {
     query.where('projects.manager_id', manager_id);
+  }
+
+  if (site_engineer_id) {
+    query.whereIn('projects.id', function () {
+      this.select('project_id')
+        .from('project_site_engineers')
+        .where('site_engineer_id', site_engineer_id);
+    });
   }
 
   return query;

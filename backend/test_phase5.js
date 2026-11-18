@@ -32,6 +32,7 @@ async function runPhase5Tests() {
 
   // Mock User.findById for authentication
   const origUserFind = User.findById;
+  const origUserFindByEmail = User.findByEmail;
   const mockUsers = {
     10: { id: 10, name: 'Alice PM', email: 'pm@example.com', role: 'project_manager', is_active: true },
     11: { id: 11, name: 'Other PM', email: 'otherpm@example.com', role: 'project_manager', is_active: true },
@@ -42,6 +43,7 @@ async function runPhase5Tests() {
   };
 
   User.findById = async (id) => mockUsers[id] || null;
+  User.findByEmail = async (email) => Object.values(mockUsers).find((u) => u.email === (email && email.toLowerCase())) || null;
 
   // Mock Project.findById & exists
   const origProjectFind = Project.findById;
@@ -172,13 +174,21 @@ async function runPhase5Tests() {
     });
     assert.strictEqual(pmAssignWorker.status, 400);
 
-    // 1.7 Assign Engineer: Valid assignment -> 201
+    // 1.7 Assign Engineer: Valid assignment by ID -> 201
     const pmAssignEng = await fetch(`${baseUrl}/projects/1/assign-engineer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${pmToken}` },
       body: JSON.stringify({ site_engineer_id: 20 }),
     });
     assert.strictEqual(pmAssignEng.status, 201);
+
+    // 1.7b Assign Engineer: Valid assignment by email -> 201
+    const pmAssignEmail = await fetch(`${baseUrl}/projects/1/assign-engineer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${pmToken}` },
+      body: JSON.stringify({ email: 'bob@example.com' }),
+    });
+    assert.strictEqual(pmAssignEmail.status, 201);
 
     // 1.8 GET assigned engineers -> 200
     const getEngRes = await fetch(`${baseUrl}/projects/1/engineers`, {
@@ -304,6 +314,7 @@ async function runPhase5Tests() {
   } finally {
     server.close();
     User.findById = origUserFind;
+    User.findByEmail = origUserFindByEmail;
     Project.findById = origProjectFind;
     Project.exists = origProjectExists;
     Project.create = origProjectCreate;

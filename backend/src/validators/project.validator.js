@@ -64,6 +64,12 @@ function validateCreateProject(body) {
     }
   }
 
+  const rawEngineerInput = body.site_engineer_email || body.engineer_email || body.site_engineer_id;
+  let validEngineerInput = null;
+  if (rawEngineerInput !== undefined && rawEngineerInput !== null && String(rawEngineerInput).trim() !== '') {
+    validEngineerInput = String(rawEngineerInput).trim();
+  }
+
   return {
     errors,
     value: {
@@ -73,6 +79,7 @@ function validateCreateProject(body) {
       end_date: validEndDate,
       manager_id: validManagerId,
       status: validStatus,
+      site_engineer_email: validEngineerInput,
     },
   };
 }

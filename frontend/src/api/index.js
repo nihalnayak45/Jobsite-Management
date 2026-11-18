@@ -18,6 +18,7 @@ export const projectApi = {
   assignEngineer: (projectId, data) => client.post(`/projects/${projectId}/assign-engineer`, data),
   removeEngineer: (projectId, engineerId) => client.delete(`/projects/${projectId}/assign-engineer/${engineerId}`),
   getEngineers: (projectId) => client.get(`/projects/${projectId}/engineers`),
+  getAvailableEngineers: () => client.get('/projects/available-engineers'),
 };
 
 // Task APIs

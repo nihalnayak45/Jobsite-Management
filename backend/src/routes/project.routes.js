@@ -16,6 +16,7 @@ const {
   assignEngineerToProject,
   removeEngineerFromProject,
   getProjectEngineers,
+  getAvailableSiteEngineers,
 } = require('../controllers/project.controller');
 
 const router = Router();
@@ -31,6 +32,12 @@ router.post(
 );
 
 router.get('/', asyncHandler(getProjects));
+
+router.get(
+  '/available-engineers',
+  authorizeRoles('project_manager', 'admin'),
+  asyncHandler(getAvailableSiteEngineers)
+);
 
 router.get('/:id', asyncHandler(getProjectById));
 

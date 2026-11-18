@@ -10,7 +10,7 @@ const ProjectSiteEngineer = require('../models/projectSiteEngineer.model');
  * Allowed roles: 'project_manager'
  */
 async function createProject(req, res) {
-  const { project_name, location, start_date, end_date, status } = req.body;
+  const { project_name, location, start_date, end_date, status, site_engineer_email } = req.body;
   let { manager_id } = req.body;
 
   // Default manager_id to req.user.id if omitted
@@ -33,10 +33,44 @@ async function createProject(req, res) {
     status,
   });
 
+  let assignedEngineer = null;
+  const rawEngineerInput = site_engineer_email || req.body.engineer_email || req.body.site_engineer_id || req.body.siteEngineerId;
+  if (rawEngineerInput) {
+    let targetUser = null;
+    if (typeof rawEngineerInput === 'string' && rawEngineerInput.includes('@')) {
+      targetUser = await User.findByEmail(rawEngineerInput.trim().toLowerCase());
+      if (!targetUser) {
+        throw new AppError(404, `Site engineer with email "${rawEngineerInput.trim()}" not found`);
+      }
+    } else {
+      const engId = Number(rawEngineerInput);
+      if (Number.isInteger(engId) && engId > 0) {
+        targetUser = await User.findById(engId);
+      }
+    }
+
+    if (targetUser) {
+      if (targetUser.role !== 'site_engineer') {
+        throw new AppError(400, `Target user must have the role 'site_engineer', found '${targetUser.role}'`);
+      }
+      if (!targetUser.is_active) {
+        throw new AppError(400, 'Target user account is deactivated');
+      }
+      await ProjectSiteEngineer.assignEngineer(project.id, targetUser.id);
+      assignedEngineer = {
+        id: targetUser.id,
+        name: targetUser.name,
+        email: targetUser.email,
+        role: targetUser.role,
+      };
+    }
+  }
+
   res.status(201).json({
     success: true,
     message: 'Project created successfully',
     project,
+    assigned_engineer: assignedEngineer,
   });
 }
 
@@ -48,6 +82,7 @@ async function createProject(req, res) {
 async function getProjects(req, res) {
   const { status, manager_id } = req.query;
   const isClient = req.user.role === 'client';
+  const isSiteEngineer = req.user.role === 'site_engineer';
 
   let parsedManagerId = null;
   if (manager_id) {
@@ -60,6 +95,7 @@ async function getProjects(req, res) {
   const projects = await Project.findAll({
     status,
     manager_id: parsedManagerId,
+    site_engineer_id: isSiteEngineer ? req.user.id : null,
     isClient,
   });
 
@@ -83,6 +119,13 @@ async function getProjectById(req, res) {
   const project = await Project.findById(id);
   if (!project) {
     throw new AppError(404, 'Project not found');
+  }
+
+  if (req.user.role === 'site_engineer') {
+    const isAssigned = await ProjectSiteEngineer.isEngineerAssigned(id, req.user.id);
+    if (!isAssigned) {
+      throw new AppError(403, 'Forbidden: You are not assigned to this project');
+    }
   }
 
   res.status(200).json({
@@ -134,7 +177,7 @@ async function updateProject(req, res) {
 /**
  * POST /api/projects/:id/assign-engineer
  * Allowed roles: 'project_manager'
- * Body: { site_engineer_id }
+ * Body: { site_engineer_id } OR { email } OR { site_engineer_email }
  */
 async function assignEngineerToProject(req, res) {
   const projectId = Number(req.params.id);
@@ -147,15 +190,28 @@ async function assignEngineerToProject(req, res) {
     throw new AppError(404, 'Project not found');
   }
 
+  const emailInput = req.body.email || req.body.site_engineer_email || req.body.engineer_email;
   const rawEngineerId = req.body.site_engineer_id || req.body.siteEngineerId;
-  const siteEngineerId = Number(rawEngineerId);
-  if (!Number.isInteger(siteEngineerId) || siteEngineerId <= 0) {
-    throw new AppError(400, 'Invalid or missing site_engineer_id');
-  }
 
-  const targetUser = await User.findById(siteEngineerId);
-  if (!targetUser) {
-    throw new AppError(404, `User with ID ${siteEngineerId} not found`);
+  let targetUser = null;
+
+  if (emailInput || (typeof rawEngineerId === 'string' && rawEngineerId.includes('@'))) {
+    const emailToFind = String(emailInput || rawEngineerId).trim().toLowerCase();
+    targetUser = await User.findByEmail(emailToFind);
+    if (!targetUser) {
+      throw new AppError(404, `Site engineer with email "${emailToFind}" not found`);
+    }
+  } else if (rawEngineerId !== undefined && rawEngineerId !== null && rawEngineerId !== '') {
+    const siteEngineerId = Number(rawEngineerId);
+    if (!Number.isInteger(siteEngineerId) || siteEngineerId <= 0) {
+      throw new AppError(400, 'Invalid site engineer email or ID');
+    }
+    targetUser = await User.findById(siteEngineerId);
+    if (!targetUser) {
+      throw new AppError(404, `User with ID ${siteEngineerId} not found`);
+    }
+  } else {
+    throw new AppError(400, 'Site engineer email or ID is required');
   }
 
   if (targetUser.role !== 'site_engineer') {
@@ -166,12 +222,36 @@ async function assignEngineerToProject(req, res) {
     throw new AppError(400, 'Target user account is deactivated');
   }
 
-  const assignment = await ProjectSiteEngineer.assignEngineer(projectId, siteEngineerId);
+  const assignment = await ProjectSiteEngineer.assignEngineer(projectId, targetUser.id);
 
   res.status(201).json({
     success: true,
     message: 'Site engineer assigned successfully',
     assignment,
+    engineer: {
+      id: targetUser.id,
+      name: targetUser.name,
+      email: targetUser.email,
+      role: targetUser.role,
+    },
+  });
+}
+
+/**
+ * GET /api/projects/available-engineers
+ * Allowed roles: 'project_manager', 'admin'
+ */
+async function getAvailableSiteEngineers(req, res) {
+  const engineers = await User.findByRole('site_engineer');
+  res.status(200).json({
+    success: true,
+    count: engineers.length,
+    engineers: engineers.map((eng) => ({
+      id: eng.id,
+      name: eng.name,
+      email: eng.email,
+      role: eng.role,
+    })),
   });
 }
 
@@ -235,4 +315,5 @@ module.exports = {
   assignEngineerToProject,
   removeEngineerFromProject,
   getProjectEngineers,
+  getAvailableSiteEngineers,
 };

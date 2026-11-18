@@ -27,6 +27,13 @@ function findByEmailWithPassword(email) {
     .first();
 }
 
+function findByRole(role) {
+  return db(TABLE)
+    .select(PUBLIC_COLUMNS)
+    .where({ role, is_active: true })
+    .orderBy('name', 'asc');
+}
+
 async function create({ name, email, passwordHash, role }) {
   const [user] = await db(TABLE)
     .insert({ name, email: normalizeEmail(email), password_hash: passwordHash, role })
@@ -43,6 +50,7 @@ module.exports = {
   findById,
   findByEmail,
   findByEmailWithPassword,
+  findByRole,
   create,
   count,
   normalizeEmail,

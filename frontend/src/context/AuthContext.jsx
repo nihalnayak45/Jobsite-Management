@@ -53,6 +53,8 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (email, password) => {
     const res = await authApi.login({ email, password });
     const { token: receivedToken, user: receivedUser } = res.data;
+    localStorage.removeItem('jms_active_project_id');
+    sessionStorage.removeItem('jms_active_project_id');
     localStorage.setItem('jms_token', receivedToken);
     localStorage.setItem('jms_user', JSON.stringify(receivedUser));
     setToken(receivedToken);
@@ -61,6 +63,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   const register = useCallback(async (userData) => {
+    localStorage.removeItem('jms_active_project_id');
+    sessionStorage.removeItem('jms_active_project_id');
     const res = await authApi.register(userData);
     return res.data;
   }, []);
@@ -68,8 +72,10 @@ export function AuthProvider({ children }) {
   const logout = useCallback(() => {
     localStorage.removeItem('jms_token');
     localStorage.removeItem('jms_user');
+    localStorage.removeItem('jms_active_project_id');
     sessionStorage.removeItem('jms_token');
     sessionStorage.removeItem('jms_user');
+    sessionStorage.removeItem('jms_active_project_id');
     setToken(null);
     setUser(null);
   }, []);

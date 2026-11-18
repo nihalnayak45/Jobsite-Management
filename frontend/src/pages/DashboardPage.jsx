@@ -178,9 +178,11 @@ export default function DashboardPage() {
     return (
       <div className="card" style={{ textAlign: 'center', padding: '3.5rem 1.5rem' }}>
         <FolderKanban size={48} style={{ color: 'var(--text-muted)', marginBottom: '1rem' }} />
-        <h3>No Projects Registered Yet</h3>
+        <h3>{user?.role === 'site_engineer' ? 'No Assigned Projects' : 'No Projects Registered Yet'}</h3>
         <p style={{ color: 'var(--text-muted)', margin: '0.5rem 0 1.5rem 0' }}>
-          Get started by registering your first jobsite project.
+          {user?.role === 'site_engineer'
+            ? 'You have not been assigned to any project yet. A Project Manager must manually assign you to a project using your registered email.'
+            : 'Get started by registering your first jobsite project.'}
         </p>
         {['admin', 'project_manager'].includes(user?.role) && (
           <a href="/projects" className="btn btn-primary">
